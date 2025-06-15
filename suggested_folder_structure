@@ -1,0 +1,29 @@
+project-root/
+├── backend/                          # Contains the Django project (Backend API & Business Logic)
+│   ├── manage.py                     # Django’s CLI tool
+│   ├── config/                       # Django project configuration (settings, URLs, WSGI/ASGI)
+│   │   ├── __init__.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   ├── wsgi.py
+│   │   └── asgi.py
+│   ├── apps/                         # Your Django apps (modular components)
+│   │   ├── accounts/                 # User management and authentication
+│   │   ├── trucks/                   # Truck/vehicle management and safety details
+│   │   ├── jobs/                     # Job posts, transactions, bids, and feedback
+│   │   └── chats/                    # Chat functionality between truck owners and hirers
+│   ├── requirements.txt              # Python dependencies
+│   ├── Dockerfile                    # (Optional) Docker configuration for backend
+│   └── .gitignore                    # Backend-specific ignore rules
+│
+└── frontend/                         # Contains the FrontEnd code (User Interface)
+    ├── public/                       # Public assets (index.html, favicon, etc.)
+    ├── src/                          # Source files (components, views, services, styles)
+    │   ├── components/               # Reusable UI components
+    │   ├── pages/                    # Page-level components (Dashboard, Login, Registration, etc.)
+    │   ├── services/                 # API calls, authentication handling, etc.
+    │   ├── App.js                    # Main React component (or similar entry point)
+    │   └── index.js                  # Application bootstrap file
+    ├── package.json                  # Node package manifest (dependencies, scripts)
+    ├── Dockerfile                    # (Optional) Docker configuration for frontend
+    └── .gitignore                    # Frontend-specific ignore rules

@@ -11,27 +11,60 @@ ROLE_CHOICES = [
     ("client", "Client"),
 ]
 
+# core/serializers.py
+from rest_framework import serializers
+from .models import CustomUser, Driver, Client
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class UserSignupSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=True)
     phone = serializers.CharField(required=True)
-    role = serializers.ChoiceField(choices=ROLE_CHOICES, required=True)
+    role = serializers.ChoiceField(choices=[('driver', 'Driver'), ('client', 'Client')], required=True)
+    # Driver-specific fields (optional)
+    license_number = serializers.CharField(required=False)
+    frequent_location = serializers.CharField(required=False)
+    personalID = serializers.ImageField(required=False)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone', 'role', 'password']
+        fields = ['id', 'username', 'email', 'phone', 'role', 'password', 'license_number', 'frequent_location', 'personalID']
+
+    def validate(self, data):
+        role = data.get('role')
+
+        if role == 'driver':
+            # Ensure all driver fields are provided
+            required_fields = ['license_number', 'frequent_location', 'personalID']
+            for field in required_fields:
+                if field not in data or not data[field]:
+                    raise serializers.ValidationError(f"{field} is required for drivers.")
+        elif role == 'client':
+            # Ensure no driver-specific fields are provided for clients
+            driver_fields = ['license_number', 'frequent_location', 'personalID']
+            for field in driver_fields:
+                if field in data and data[field]:
+                    raise serializers.ValidationError(f"{field} should not be provided for clients.")
+
+        return data
 
     def create(self, validated_data):
+        # Extract driver-specific fields if present
+        driver_fields = ['license_number', 'frequent_location', 'personalID']
+        driver_data = {field: validated_data.pop(field) for field in driver_fields if field in validated_data}
         password = validated_data.pop('password')
+
+        # Create the user
         user = User(**validated_data)
         user.set_password(password)
         user.save()
-        # Optionally we can add asynchronous tasks here to send welcome emails.
-        return user
 
-class UserLoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
+        # Store driver data in a temporary attribute for the signal
+        if user.role == 'driver':
+            user._driver_data = driver_data
+
+        return user
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

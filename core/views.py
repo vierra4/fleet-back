@@ -328,3 +328,30 @@ class DemoRequestCreateAPIView(generics.CreateAPIView):
     queryset         = DemoRequest.objects.all()
     serializer_class = DemoRequestSerializer
     permission_classes = [permissions.AllowAny]
+
+
+class RegisterView(generics.CreateAPIView):
+    """
+    POST /api/auth/register/  -> { tokens: { refresh, access }, user: { id, username, role } }
+    Registers a new user with a role (driver or client) and returns JWT tokens.
+    """
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSignupSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            },
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'role': user.role,
+            }
+        }, status=status.HTTP_201_CREATED)

@@ -36,6 +36,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             "user": {
                 "id": self.user.id,
                 "username": self.user.username,
+                "role": self.user.role if self.user.role else None
             },
         }
 

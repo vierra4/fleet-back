@@ -17,6 +17,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import ListAPIView  
 from .serializers import *
 from .models import *
+from rest_framework import generics
 User = get_user_model()
 # core/views.py
 

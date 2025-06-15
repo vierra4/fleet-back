@@ -18,9 +18,6 @@ router.register(r'trips', TripViewSet, basename='trip')
 
 urlpatterns = [
     # Authentication endpoints
-    path('auth/signup/', SignupView.as_view(), name='signup'),
-    path('auth/login/', LoginView.as_view(), name='login'),
-    path('auth/logout/', LogoutView.as_view(), name='logout'),
     path('auth/user/', UserInfoView.as_view(), name='user-info'),
     # Public endpoint for pending job posts
     path('public/jobposts/', PublicJobPostListView.as_view(), name='public-jobposts'),

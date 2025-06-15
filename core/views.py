@@ -321,3 +321,9 @@ class TripViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Depending on use case, we may enforce that only certain users can create trips.
         serializer.save()
+#regisetr views point handling all roles accoridngly. 
+#demo
+class DemoRequestCreateAPIView(generics.CreateAPIView):
+    queryset         = DemoRequest.objects.all()
+    serializer_class = DemoRequestSerializer
+    permission_classes = [permissions.AllowAny]

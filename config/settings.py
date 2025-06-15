@@ -10,7 +10,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+SECRET_KEY = "12345678uytredfghui876543e3erthewqe45"#os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG_MODE')
@@ -33,7 +33,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "app/core",
+    #"apps.core",
+    "core.apps.CoreConfig",
     "cloudinary",
     'rest_framework',
     'rest_framework.authtoken',
@@ -101,9 +102,9 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 #cloudinary settings
 cloudinary.config(
-    cloud_name = os.getenv('cloudinary_cloud_name')       
-    api_key = os.getenv('cloudinary_api_key')      
-    api_secret = os.getenv('cloudinary_api_secret')  
+    cloud_name = os.getenv('cloudinary_cloud_name') ,      
+    api_key = os.getenv('cloudinary_api_key')      ,
+    api_secret = os.getenv('cloudinary_api_secret') , 
 )
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

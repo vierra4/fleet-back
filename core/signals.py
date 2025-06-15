@@ -1,10 +1,11 @@
 # core/signals.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import *
+from .models import CustomUser, Driver, Client
 from django.conf import settings
 from django.core.mail import send_mail
 
+# Existing signal for DemoRequest
 @receiver(post_save, sender=DemoRequest)
 def send_demo_request_email(sender, instance, created, **kwargs):
     if not created:
@@ -26,3 +27,20 @@ def send_demo_request_email(sender, instance, created, **kwargs):
         ["marvinavi24@gmail.com"],
         fail_silently=False,
     )
+
+# New signal for CustomUser
+@receiver(post_save, sender=CustomUser)
+def create_user_profile(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    if instance.role == 'driver':
+        driver_data = getattr(instance, '_driver_data', {})
+        Driver.objects.create(
+            user=instance,
+            license_number=driver_data.get('license_number'),
+            frequent_location=driver_data.get('frequent_location'),
+            personalID=driver_data.get('personalID')
+        )
+    elif instance.role == 'client':
+        Client.objects.create(user=instance)

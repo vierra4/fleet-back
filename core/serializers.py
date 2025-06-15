@@ -164,3 +164,11 @@ class JobBidSerializer(serializers.ModelSerializer):
             'job_post', 'driver', 'bid_message', 'proposed_price',
             'estimated_turnaround', 'status', 'created_at', 'updated_at'
         ]
+#demo
+class DemoRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = DemoRequest
+        fields = [
+            "id",  "email", "datetime", "message","company", "phone", "created_at"
+        ]
+        read_only_fields = ["id", "created_at"]

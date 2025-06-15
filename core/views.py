@@ -17,6 +17,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import ListAPIView  
 from .serializers import *
 from .models import *
+from rest_framework import generics
 User = get_user_model()
 # core/views.py
 
@@ -321,3 +322,9 @@ class TripViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Depending on use case, we may enforce that only certain users can create trips.
         serializer.save()
+#regisetr views point handling all roles accoridngly. 
+#demo
+class DemoRequestCreateAPIView(generics.CreateAPIView):
+    queryset         = DemoRequest.objects.all()
+    serializer_class = DemoRequestSerializer
+    permission_classes = [permissions.AllowAny]

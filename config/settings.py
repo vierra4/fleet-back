@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "12345678uytredfghui876543e3erthewqe45"#os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG_MODE')
+DEBUG = True#os.getenv('DEBUG_MODE')
 
 AUTH_USER_MODEL = 'core.CustomUser'  
 
@@ -133,6 +133,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 # Session settings
 SESSION_COOKIE_AGE = 1800  # Session lasts for 30 minutes
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session even if browser is closed 
@@ -178,4 +182,26 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
+}
+
+
+# settings.py
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        'core': {  # Your app name
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
 }

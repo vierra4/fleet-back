@@ -11,8 +11,6 @@ ROLE_CHOICES = [
     ("client", "Client"),
 ]
 
-
-
 class UserSignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     phone = serializers.CharField(required=True)

@@ -31,7 +31,8 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     is_driver = models.BooleanField(default=False)
     email = models.EmailField(unique=True)  # Add unique=True
-
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
     def __str__(self):
         return self.username
 

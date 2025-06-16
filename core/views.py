@@ -18,28 +18,48 @@ from rest_framework.generics import ListAPIView
 from .serializers import *
 from .models import *
 from rest_framework import generics
+from django.contrib.auth import get_user_model, authenticate
+from django.db.models import Q
 User = get_user_model()
 # core/views.py
 
-
-
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
-    Extends SimpleJWT to include user info in the token response.
+    Custom serializer to allow login with either username or email.
+    Expects 'identifier' (username or email) and 'password' in the request.
     """
+    identifier = serializers.CharField(required=True)
+    password = serializers.CharField(required=True, write_only=True)
+
     def validate(self, attrs):
-        data = super().validate(attrs)
-        return {
+        identifier = attrs.get('identifier')
+        password = attrs.get('password')
+
+        # Try to find user by username or email
+        try:
+            user = User.objects.get(Q(username=identifier) | Q(email=identifier))
+        except User.DoesNotExist:
+            raise serializers.ValidationError({'identifier': 'No user found with this username or email.'})
+
+        # Authenticate user
+        user = authenticate(username=user.username, password=password)
+        if user is None:
+            raise serializers.ValidationError({'password': 'Invalid password.'})
+
+        # Generate tokens
+        refresh = self.get_token(user)
+        data = {
             "tokens": {
-                "refresh": data["refresh"],
-                "access": data["access"],
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
             },
             "user": {
-                "id": self.user.id,
-                "username": self.user.username,
-                "role": self.user.role if self.user.role else None
+                "id": user.id,
+                "username": user.username,
+                "role": user.role if user.role else None
             },
         }
+        return data
 
     @classmethod
     def get_token(cls, user):

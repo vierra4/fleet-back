@@ -30,6 +30,7 @@ class CustomUser(AbstractUser):
     phone = models.CharField(max_length=50, blank=True, null=True)
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     is_driver = models.BooleanField(default=False)
+    email = models.EmailField(unique=True)  # Add unique=True
 
     def __str__(self):
         return self.username

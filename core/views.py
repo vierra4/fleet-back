@@ -76,13 +76,12 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 class UserInfoView(APIView):
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
-
 # --- Model ViewSets with User-Specific Endpoints ---
 
 class DriverViewSet(viewsets.ModelViewSet):

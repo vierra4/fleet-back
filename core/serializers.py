@@ -11,12 +11,7 @@ ROLE_CHOICES = [
     ("client", "Client"),
 ]
 
-# core/serializers.py
-from rest_framework import serializers
-from .models import CustomUser, Driver, Client
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
 
 class UserSignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)

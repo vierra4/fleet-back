@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.authentication import JWTAuthentication as TokenAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -13,6 +13,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import ListAPIView  
 from .serializers import *
@@ -22,44 +23,22 @@ from django.contrib.auth import get_user_model, authenticate
 from django.db.models import Q
 User = get_user_model()
 # core/views.py
-
-# core/views.py
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    identifier = serializers.CharField(required=True)
-    password = serializers.CharField(required=True, write_only=True)
-
+    """
+    Extends SimpleJWT to include user info in the token response.
+    """
     def validate(self, attrs):
-        identifier = attrs.get('identifier')
-        password = attrs.get('password')
-
-        # Try to find user by username or email
-        user = User.objects.filter(Q(username=identifier) | Q(email=identifier)).first()
-        if not user:
-            raise serializers.ValidationError({'identifier': 'No user found with this username or email.'})
-
-        # Authenticate user
-        user = authenticate(username=user.username, password=password)
-        if not user:
-            raise serializers.ValidationError({'password': 'Invalid password.'})
-
-        # Ensure user is active
-        if not user.is_active:
-            raise serializers.ValidationError({'identifier': 'This user account is inactive.'})
-
-        # Generate tokens
-        refresh = self.get_token(user)
-        data = {
+        data = super().validate(attrs)
+        return {
             "tokens": {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
+                "refresh": data["refresh"],
+                "access": data["access"],
             },
             "user": {
-                "id": user.id,
-                "username": user.username,
-                "role": user.role if user.role else None
+                "id": self.user.id,
+                "username": self.user.username,
             },
         }
-        return data
 
     @classmethod
     def get_token(cls, user):
@@ -73,6 +52,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
     POST /api/auth/token/  -> { tokens: { refresh, access }, user: {...} }
     """
     serializer_class = MyTokenObtainPairSerializer
+
 
 
 class UserInfoView(APIView):

@@ -133,6 +133,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 # Session settings
 SESSION_COOKIE_AGE = 1800  # Session lasts for 30 minutes
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session even if browser is closed 

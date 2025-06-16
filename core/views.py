@@ -23,11 +23,8 @@ from django.db.models import Q
 User = get_user_model()
 # core/views.py
 
+# core/views.py
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """
-    Custom serializer to allow login with either username or email.
-    Expects 'identifier' (username or email) and 'password' in the request.
-    """
     identifier = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
 
@@ -36,15 +33,18 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         password = attrs.get('password')
 
         # Try to find user by username or email
-        try:
-            user = User.objects.get(Q(username=identifier) | Q(email=identifier))
-        except User.DoesNotExist:
+        user = User.objects.filter(Q(username=identifier) | Q(email=identifier)).first()
+        if not user:
             raise serializers.ValidationError({'identifier': 'No user found with this username or email.'})
 
         # Authenticate user
         user = authenticate(username=user.username, password=password)
-        if user is None:
+        if not user:
             raise serializers.ValidationError({'password': 'Invalid password.'})
+
+        # Ensure user is active
+        if not user.is_active:
+            raise serializers.ValidationError({'identifier': 'This user account is inactive.'})
 
         # Generate tokens
         refresh = self.get_token(user)
